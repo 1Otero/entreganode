@@ -13,10 +13,6 @@ async function refff(infoCarritoBody, listUpdate){
         const product = await getProductR(productId)
         const cantidadProduct= product?.cantidad==null?0:product?.cantidad
         const cantidadRequiere= p?.cantidad==null?0:p?.cantidad
-        console.log(productId)
-        console.log(product)
-        console.log(cantidadProduct)
-        console.log(cantidadRequiere)
         if(product && cantidadProduct < 1 | cantidadRequiere > cantidadProduct ){
             listUpdate.listErrorUpdate.push({product, message: `La cantidad requerida es: ${cantidadRequiere} y cuenta con: ${cantidadProduct}`})
             listUpdate.status= 2;

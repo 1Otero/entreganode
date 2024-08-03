@@ -59,7 +59,6 @@ module.exports= class pagosRepository {
       return body
     }
     static async getTransationR(id){
-      console.log(id)
       const transation= await fetch(`https://api-sandbox.co.uat.wompi.dev/v1/transactions/${id}`)
       .catch(err => {
         console.log("error get transation: ")

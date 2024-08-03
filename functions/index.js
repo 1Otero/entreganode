@@ -4,6 +4,7 @@ const product= require("./controllers/product/productController")
 const pagos= require("./controllers/utils/pagos/pagostController")
 const cors= require("cors")
 const a= require("./utils/utils")
+const serverless= require('serverless-http')
 
 const { PORT }= require("./utils/utils")
 app.set("port", PORT || 8080)
@@ -21,3 +22,5 @@ app.use("/pago", pagos)
 app.listen(app.get("port"), () => {
     console.log(`Listen in ${PORT}`)
 })
+
+module.exports.handler= serverless(app)
