@@ -137,7 +137,7 @@ module.exports= {
       //     }   
       //   })
       reference= uuid.v4()
-      signature= reference + amount_in_cents + currency + nada.NADAINTEGRY
+      signature= reference + amount_in_cents + currency + nada.NADAINTEGRY.slice(0, -1)
       signature= cryptoJs.SHA256(signature).toString()
       console.log(customer_email)
       console.log(customer_data)

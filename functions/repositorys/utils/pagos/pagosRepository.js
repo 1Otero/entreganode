@@ -6,7 +6,7 @@ const nada= require("./../../../utils/utils")
 // }
 module.exports= class pagosRepository {
     static async retornarTokenYUrlAcceptacion(name=String){
-      const meInstutions= await fetch(`https://api-sandbox.co.uat.wompi.dev/v1/merchants/${nada.NADA}`)
+      const meInstutions= await fetch(`https://api-sandbox.co.uat.wompi.dev/v1/merchants/${nada.NADA.split(0, -1)}`)
       .catch(err => {
         console.log("error fetch get financial institutions")
         return null
@@ -27,7 +27,7 @@ module.exports= class pagosRepository {
         method: 'POST',
         body: JSON.stringify(infoTargeta),
         headers: {
-          "Authorization": `Bearer ${nada.NADA}`,
+          "Authorization": `Bearer ${nada.NADA.slice(0, -1)}`,
           "Content-Type": "application/json"
         }
       })
@@ -48,7 +48,7 @@ module.exports= class pagosRepository {
         body: JSON.stringify(infoPago),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${nada.NADA}`
+          "Authorization": `Bearer ${nada.NADA.slice(0, -1)}`
         }
       })
       .catch(err => {
