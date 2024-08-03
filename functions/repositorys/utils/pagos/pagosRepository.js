@@ -6,13 +6,14 @@ const nada= require("./../../../utils/utils")
 // }
 module.exports= class pagosRepository {
     static async retornarTokenYUrlAcceptacion(name=String){
-      console.log("name: ")
-      console.log(name)
       const meInstutions= await fetch(`https://api-sandbox.co.uat.wompi.dev/v1/merchants/${nada.NADA}`)
       .catch(err => {
         console.log("error fetch get financial institutions")
         return null
       })
+      if(!meInstutions){
+        return null
+      }
       const body= await meInstutions.json()
       return body;
     }
@@ -35,6 +36,9 @@ module.exports= class pagosRepository {
         console.log(err)
         return null
       })
+      if(!tarjetaBody){
+        return null 
+      }
       const body= await tarjetaBody.json()
       return body;
     }
@@ -62,6 +66,7 @@ module.exports= class pagosRepository {
         console.log(err)
         return null
       })
+      if(!transation) return null
       const transationBody= await transation.json()
       return transationBody
     }

@@ -9,7 +9,7 @@ module.exports= {
       return res.json({success: null, status: 404})
     },
     getProductS: async (req=request, res=response) => {
-      let idProduct= req.params['id']??0
+      let idProduct= req.params['id']==null?0:req.params['id']
       const product= await getProductR(idProduct)
       if(product){
         return res.json({success: product, status: 200})  
@@ -18,8 +18,8 @@ module.exports= {
     },
     createProductS: async (req=request, res=response) => {
         let { name, description, cantidad, precio }= req.body
-        cantidad=cantidad??0
-        precio= precio??0
+        cantidad=cantidad==null?0:cantidad
+        precio= precio==null?0:precio
         const createdProduct= await createProductR({name, description, cantidad, precio})
         if(createdProduct){
           return res.json({success: createdProduct, status: 200})

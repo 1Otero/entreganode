@@ -12,6 +12,7 @@ module.exports= class productRepository {
        return allProducts;
     }
     static async getProductR(idProduct= mongoose.Types.ObjectId){
+      console.log(idProduct)
        const product= await Product.findById({_id: idProduct})
        .catch(err => {
         console.log("err get Product")

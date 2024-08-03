@@ -8,15 +8,18 @@ const cryptoJs= require("crypto-js")
 async function refff(infoCarritoBody, listUpdate){
     let productVerify= Object.create({})
     for(p of infoCarritoBody){
-        const productId= p?._id??0
+        //const p= prd.product
+        const productId= p?._id==null?0:p?._id
         const product = await getProductR(productId)
-        const cantidadProduct= product?.cantidad??0
-        const cantidadRequiere= p?.cantidad??0
+        const cantidadProduct= product?.cantidad==null?0:product?.cantidad
+        const cantidadRequiere= p?.cantidad==null?0:p?.cantidad
+        console.log(productId)
+        console.log(product)
+        console.log(cantidadProduct)
+        console.log(cantidadRequiere)
         if(product && cantidadProduct < 1 | cantidadRequiere > cantidadProduct ){
             listUpdate.listErrorUpdate.push({product, message: `La cantidad requerida es: ${cantidadRequiere} y cuenta con: ${cantidadProduct}`})
             listUpdate.status= 2;
-            console.log("error cantidad o algo :::::")
-            console.log(productVerify)
             productVerify= {}
             continue
             //return res.json({success: `La cantidad requerida es: ${cantidadRequiere} y cuenta con: ${cantidadProduct}`, status: 201})
@@ -42,13 +45,16 @@ module.exports= {
        return res.json({success: "fallo aceptacion con token cliente", status: 404})
     },
     tokenizarTarjetaS: async (req=request, res=response) => {
-        const { number, cvc, exp_month, exp_year, card_holder }= req.body
+        //const { number, cvc, exp_month, exp_year, card_holder }= req.body
+        const { number, cvc, expiry, name }= req.body
+        const exp_month= expiry.substring(0, 2)
+        const exp_year= expiry.substring(2, 4)
         const body= await tokenizarTarjetaR({
             number,
             cvc,
             exp_month,
             exp_year,
-            card_holder
+            card_holder: name
         })
         if(body){
             if(body.status == 'CREATED' && body.data){
@@ -64,7 +70,8 @@ module.exports= {
       let { acceptance_token, customer_email, reference, amount_in_cents, currency, signature, payment_method,
       customer_data, infoCarrito }= req.body
       const listUpdate= {listErrorUpdate: [], updatedProducer: [], status: 0}
-      if(!infoCarrito && !infoCarrito.listProduct){
+      //if(!infoCarrito && !infoCarrito.listProduct){
+      if(!infoCarrito){
         return res.json({success: "debe enviar informacion de la compra", status: 202})
       }
       let infoCarritoBody = infoCarrito.listProduct
@@ -104,6 +111,8 @@ module.exports= {
     //   if(listUpdate.listErrorUpdate > 0 || listUpdate.status == 2 && productVerify.length < 1){
     //      return res.json({success: "la cantidad de productos no es suficiente para satisfacer la compra", status: 201})
     //   }
+    console.log("productVerify: ------------------------------------------- ")
+      console.log(productVerify)
       if(Object.keys(productVerify).length != infoCarritoBody.length){
         return res.json({success: "la cantidad de productos no es suficiente, existen productos con cantidades insuficientes ", listUpdate, status: 403})
       }
@@ -130,6 +139,8 @@ module.exports= {
       reference= uuid.v4()
       signature= reference + amount_in_cents + currency + nada.NADAINTEGRY
       signature= cryptoJs.SHA256(signature).toString()
+      console.log(customer_email)
+      console.log(customer_data)
       const bodyInfo= await sendMePagoR({
       acceptance_token,
       customer_email,
@@ -139,13 +150,19 @@ module.exports= {
       signature,
       payment_method,
       customer_data })
+      if(!bodyInfo) return res.json({success: "fallo realiar el pago", status: 201})
       const body= await bodyInfo.json()
+      console.log(body)
       if(body.data){
         //Una vez que se realice el pago se debe enviar un correo con la informacion del pago, pero se debe validar si enviar aqui o despues con otro metodo
         infoCarritoBody.forEach(async p => {
-            const productId= p._id??0
+            const productId= p._id==null?0:p._id
             //const product = await getProductR(productId)
             const product= productVerify[productId]
+            console.log(p)
+            console.log(product)
+            console.log(productVerify)
+
             product.cantidad= product.cantidad - p.cantidad
             const updated= await modifyAmountR(product)
             if(updated){
