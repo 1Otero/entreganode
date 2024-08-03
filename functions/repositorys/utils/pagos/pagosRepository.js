@@ -6,7 +6,7 @@ const nada= require("./../../../utils/utils")
 // }
 module.exports= class pagosRepository {
     static async retornarTokenYUrlAcceptacion(name=String){
-      const meInstutions= await fetch(`https://api-sandbox.co.uat.wompi.dev/v1/merchants/${nada.NADA.split(0, -1)}`)
+      const meInstutions= await fetch(`https://api-sandbox.co.uat.wompi.dev/v1/merchants/${nada.NADA.slice(0, -1)}`)
       .catch(err => {
         console.log("error fetch get financial institutions")
         return null
