@@ -30,7 +30,8 @@ module.exports= {
         const { _id, name, description, cantidad, precio }= req.body
         //const { _id, cantidad}= req.body
         const product= await getProductR(_id)
-        if(!product && product.cantidad<0){
+        console.log(product)
+        if(!product || product.cantidad<0){
             return res.json({success: "product not found", status: 404})
         }
         product.name= name??product.name

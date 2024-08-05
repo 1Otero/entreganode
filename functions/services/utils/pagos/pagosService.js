@@ -43,14 +43,21 @@ module.exports= {
     tokenizarTarjetaS: async (req=request, res=response) => {
         //const { number, cvc, exp_month, exp_year, card_holder }= req.body
         const { number, cvc, expiry, name }= req.body
-        const exp_month= expiry.substring(0, 2)
-        const exp_year= expiry.substring(2, 4)
+        let exp_month= "00";
+        let exp_year= "00";
+        if(expiry.length == 6){
+         exp_month= expiry.substring(0, 2)
+         exp_year= expiry.substring(4, 6)
+        }else{
+         exp_month= expiry.substring(0, 2)
+         exp_year= expiry.substring(2, 4)
+        }
         const body= await tokenizarTarjetaR({
-            number,
-            cvc,
-            exp_month,
-            exp_year,
-            card_holder: name
+          number,
+          cvc,
+          exp_month,
+          exp_year,
+          card_holder: name
         })
         if(body){
             if(body.status == 'CREATED' && body.data){
