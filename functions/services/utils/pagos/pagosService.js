@@ -5,7 +5,7 @@ const nada= require("./../../../utils/utils")
 const uuid= require("uuid")
 const cryptoJs= require("crypto-js")
 
-async function refff(infoCarritoBody, listUpdate){
+async function refff(infoCarritoBody, listUpdate, montoAPagar){
     let productVerify= Object.create({})
     for(p of infoCarritoBody){
         //const p= prd.product
@@ -20,9 +20,15 @@ async function refff(infoCarritoBody, listUpdate){
             continue
             //return res.json({success: `La cantidad requerida es: ${cantidadRequiere} y cuenta con: ${cantidadProduct}`, status: 201})
         }
+        const productPrecio= product.precio==null?0:product.precio
+        const precioProduct= p.precio==null?productPrecio:p.precio
+        const total= cantidadRequiere * precioProduct
+        montoAPagar+= total
+        product.precio= montoAPagar
         productVerify[productId]= product
     }
-    return productVerify  
+    //return productVerify  
+    return [productVerify, montoAPagar]
 }
 module.exports= {
     sendPagoS: (req= request, res= response) => {
@@ -78,7 +84,12 @@ module.exports= {
         return res.json({success: "debe enviar informacion de la compra", status: 202})
       }
       let infoCarritoBody = infoCarrito.listProduct
-      const productVerify= await refff(infoCarritoBody, listUpdate)
+      let montoAPagar= 0
+      const productVerify2= await refff(infoCarritoBody, listUpdate, montoAPagar)
+      const productVerify= productVerify2[0]
+      const totalMonto= productVerify2[1]
+      const totalStringInCents= String(totalMonto).concat("00")
+      const totalInCentsPay= Number(totalStringInCents)
       //const listUpdate= {listErrorUpdate: [{product: null, message: ""}], updatedProducer: [], status: 0}  
       
       if(Object.keys(productVerify).length != infoCarritoBody.length){
@@ -86,13 +97,14 @@ module.exports= {
       }
       
       reference= uuid.v4()
-      signature= reference + amount_in_cents + currency + nada.NADAINTEGRY.slice(0, -1)
+      //signature= reference + amount_in_cents + currency + nada.NADAINTEGRY.slice(0, -1)
+      signature= reference + totalInCentsPay + currency + nada.NADAINTEGRY.slice(0, -1)
       signature= cryptoJs.SHA256(signature).toString()
       const bodyInfo= await sendMePagoR({
       acceptance_token,
       customer_email,
       reference,
-      amount_in_cents,
+      amount_in_cents: totalInCentsPay,
       currency,
       signature,
       payment_method,
